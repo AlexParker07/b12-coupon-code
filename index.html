@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>B12 Website Launch Planner</title>
+  <meta name="description" content="A free interactive B12 website launch planner for tracking pages, client tools, and launch progress." />
+  <style>
+    :root{
+      --bg:#0f172a; --card:#1e293b; --line:#334155;
+      --text:#f1f5f9; --muted:#94a3b8; --accent:#38bdf8; --accent-2:#16a34a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; font-family:Arial,Helvetica,sans-serif;
+      background:radial-gradient(1200px 600px at 50% -10%,#1b2740,transparent),var(--bg);
+      color:var(--text); display:flex; flex-direction:column; align-items:center; padding:24px;
+    }
+    h1{font-size:clamp(24px,5vw,38px); margin:32px 0 4px; text-align:center}
+    .sub{color:var(--muted); margin:0 0 28px; text-align:center; max-width:640px; line-height:1.5}
+    .card{
+      background:var(--card); border:1px solid var(--line); border-radius:16px;
+      padding:26px; width:100%; max-width:520px;
+      box-shadow:0 20px 40px rgba(0,0,0,.35);
+    }
+    .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:22px}
+    .stat{background:#0f1a2e; border:1px solid var(--line); border-radius:12px; padding:16px 10px; text-align:center}
+    .stat .label{font-size:12px; color:var(--muted); margin-bottom:6px}
+    .stat .value{font-size:28px; font-weight:700}
+    .checklist{display:grid; gap:10px; margin:18px 0}
+    label{
+      display:flex; align-items:center; gap:10px; background:#0f1a2e;
+      border:1px solid var(--line); border-radius:10px; padding:12px;
+      cursor:pointer; color:var(--text);
+    }
+    input[type="checkbox"]{width:18px; height:18px; accent-color:var(--accent-2)}
+    .progress-wrap{background:#0f1a2e; border:1px solid var(--line); border-radius:999px; overflow:hidden; height:14px; margin:10px 0 18px}
+    .progress{height:100%; width:0%; background:var(--accent-2); transition:width .2s ease}
+    .tip{
+      color:var(--muted); font-size:14px; line-height:1.45; background:#0f1a2e;
+      border:1px solid var(--line); border-radius:10px; padding:12px; margin-top:12px;
+    }
+    button{
+      width:100%; padding:13px 18px; border:none; border-radius:10px; cursor:pointer;
+      font-size:15px; font-weight:700; color:#04210f; background:var(--accent-2);
+      transition:transform .05s ease, background .2s ease;
+    }
+    button:hover{background:#15803d}
+    button:active{transform:translateY(1px)}
+    .reset{margin-top:10px; background:transparent; color:var(--muted); font-weight:500; font-size:13px}
+    .reset:hover{background:transparent; color:var(--text)}
+    .cta{
+      display:block; margin:18px auto 0; max-width:520px; width:100%; text-decoration:none;
+      background:var(--accent); color:#06111d; font-weight:700; text-align:center;
+      padding:14px 18px; border-radius:10px;
+    }
+    .cta:hover{filter:brightness(1.05)}
+    footer{color:var(--muted); font-size:12px; margin-top:28px; max-width:620px; text-align:center; line-height:1.5}
+    @media (max-width:520px){.stats{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <h1>🚀 B12 Website Launch Planner</h1>
+  <p class="sub">Plan the essentials before launching your B12 site. Check off each milestone, watch your launch score climb, and come back later — your progress is saved in your browser.</p>
+
+  <div class="card">
+    <div class="stats">
+      <div class="stat"><div class="label">Launch Score</div><div class="value" id="score">0%</div></div>
+      <div class="stat"><div class="label">Tasks Done</div><div class="value" id="done">0</div></div>
+      <div class="stat"><div class="label">Site Readiness</div><div class="value" id="readiness">Draft</div></div>
+    </div>
+
+    <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+
+    <div class="checklist" id="checklist">
+      <label><input type="checkbox" data-task="prompt"> Write a clear AI website prompt</label>
+      <label><input type="checkbox" data-task="brand"> Add business name, services, and brand tone</label>
+      <label><input type="checkbox" data-task="pages"> Confirm homepage, about, services, and contact pages</label>
+      <label><input type="checkbox" data-task="domain"> Connect or choose a custom domain</label>
+      <label><input type="checkbox" data-task="leads"> Add lead capture or contact forms</label>
+      <label><input type="checkbox" data-task="clients"> Set up client intake, email, or contact tools</label>
+      <label><input type="checkbox" data-task="seo"> Review page titles, descriptions, and analytics</label>
+      <label><input type="checkbox" data-task="publish"> Publish and test the live site on mobile</label>
+    </div>
+
+    <button id="completeBtn">Mark Launch Review Complete</button>
+    <button class="reset" id="resetBtn">Reset planner</button>
+
+    <div class="tip" id="tip">Tip: Start with your offer and audience first. A better prompt usually creates a better first website draft.</div>
+  </div>
+
+  <a class="cta" href="https://tinyurl.com/y4nppe43" target="_blank" rel="noopener sponsored">
+    🎁 Get B12: 15% OFF annual plans + free plan →
+  </a>
+
+  <footer>
+    Built for website owners exploring B12. This page contains an affiliate link — we may earn a commission at no extra cost to you. Not affiliated with or endorsed by B12.
+  </footer>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const tasks = Array.from(document.querySelectorAll("input[type='checkbox']"));
+    const tips = [
+      "Tip: Start with your offer and audience first. A better prompt usually creates a better first website draft.",
+      "Tip: Your contact form should ask only for the fields you truly need. Shorter forms usually convert better.",
+      "Tip: Before publishing, test the site on a phone. Mobile polish matters more than most people admit.",
+      "Tip: Add a strong call-to-action above the fold so visitors know exactly what to do next.",
+      "Tip: Review SEO titles and meta descriptions before launch. Tiny copy tweaks can make the site feel sharper."
+    ];
+
+    function readState(){
+      try {
+        return JSON.parse(localStorage.getItem("b12LaunchPlanner") || "{}");
+      } catch(e) {
+        return {};
+      }
+    }
+
+    function saveState(){
+      const state = {};
+      tasks.forEach(task => state[task.dataset.task] = task.checked);
+      localStorage.setItem("b12LaunchPlanner", JSON.stringify(state));
+    }
+
+    function readinessLabel(percent){
+      if (percent === 100) return "Ready";
+      if (percent >= 75) return "Close";
+      if (percent >= 40) return "Building";
+      return "Draft";
+    }
+
+    function render(){
+      const done = tasks.filter(task => task.checked).length;
+      const percent = Math.round((done / tasks.length) * 100);
+      $("done").innerText = done;
+      $("score").innerText = percent + "%";
+      $("readiness").innerText = readinessLabel(percent);
+      $("progress").style.width = percent + "%";
+      $("tip").innerText = tips[Math.min(done, tips.length - 1)];
+      saveState();
+    }
+
+    function load(){
+      const state = readState();
+      tasks.forEach(task => {
+        task.checked = Boolean(state[task.dataset.task]);
+        task.addEventListener("change", render);
+      });
+      render();
+    }
+
+    function completeReview(){
+      tasks.forEach(task => task.checked = true);
+      render();
+    }
+
+    function resetPlanner(){
+      if (!confirm("Reset your B12 launch planner?")) return;
+      tasks.forEach(task => task.checked = false);
+      localStorage.removeItem("b12LaunchPlanner");
+      render();
+    }
+
+    $("completeBtn").addEventListener("click", completeReview);
+    $("resetBtn").addEventListener("click", resetPlanner);
+    load();
+  </script>
+</body>
+</html>
